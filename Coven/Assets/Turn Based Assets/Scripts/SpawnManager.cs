@@ -19,19 +19,19 @@ public class SpawnManager : MonoBehaviour
 
     public void SpawnPlayers()
     {
-        PlayerCharacterManager[] players = FindObjectsOfType<PlayerCharacterManager>();
-        for(int ctr = 0; ctr < players.Length; ctr++)
-        {
-            if(ctr < playerSpawnPoints.Count && playerSpawnPoints[ctr] != null)
-            {
-                players[ctr].gameObject.transform.SetPositionAndRotation(playerSpawnPoints[ctr], Quaternion.identity);
-            }
-            else
-            {
-                Debug.Log("No spawn point found for player: " + players[ctr].gameObject.name);
-                players[ctr].gameObject.SetActive(false);
-            }
+        //PlayerCharacterManager[] players = FindObjectsOfType<PlayerCharacterManager>();
+        //for(int ctr = 0; ctr < players.Length; ctr++)
+        //{
+        //    if(ctr < playerSpawnPoints.Count && playerSpawnPoints[ctr] != null)
+        //    {
+        //        players[ctr].gameObject.transform.SetPositionAndRotation(playerSpawnPoints[ctr], Quaternion.identity);
+        //    }
+        //    else
+        //    {
+        //        Debug.Log("No spawn point found for player: " + players[ctr].gameObject.name);
+        //        players[ctr].gameObject.SetActive(false);
+        //    }
             
-        }
+        //}
     }
 }

@@ -129,13 +129,13 @@ public class GridManager : MonoBehaviour
 
     public void CheckCharacterTiles()
     {
-        CharacterPathfinding[] characters = FindObjectsOfType<CharacterPathfinding>();
-        foreach (CharacterPathfinding character in characters)
-        {
-            //Debug.Log("Character at " + character.transform.position);
-            SetTileWalkable(new Vector2Int(Mathf.RoundToInt(character.transform.position.x), Mathf.RoundToInt(character.transform.position.y)), 0f);
+        //CharacterPathfinding[] characters = FindObjectsOfType<CharacterPathfinding>();
+        //foreach (CharacterPathfinding character in characters)
+        //{
+        //    //Debug.Log("Character at " + character.transform.position);
+        //    SetTileWalkable(new Vector2Int(Mathf.RoundToInt(character.transform.position.x), Mathf.RoundToInt(character.transform.position.y)), 0f);
             
-        }
+        //}
     }
 
     public bool CheckIfCharacterOnTile(Vector2Int tile)
@@ -158,21 +158,5 @@ public class GridManager : MonoBehaviour
         }
 
         return rightCharacter;
-    }
-
-    public DoorManager GetDoorOnTile(Vector2Int tile)
-    {
-        DoorManager rightDoor = null;
-        DoorManager[] allDoors = FindObjectsOfType<DoorManager>();
-        foreach (DoorManager door in allDoors)
-        {
-            if (Vector2.Distance(door.transform.position, tile) < 1f)
-            {
-                rightDoor = door;
-                break;
-            }
-        }
-
-        return rightDoor;
     }
 }
