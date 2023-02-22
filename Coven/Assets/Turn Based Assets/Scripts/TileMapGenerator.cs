@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using UnityEngine.AI;
 using System.IO;
 using UnityEditor;
 
@@ -78,6 +79,21 @@ public class TileMapGenerator : MonoBehaviour
 
         gridManager.Setup();
         spawnManager.SpawnPlayers();
+        spawnManager.SpawnEnemies();
+        FindObjectOfType<NavMeshSurface>().BuildNavMesh();
+        List<NavMeshSurface> surfaces = NavMeshSurface.activeSurfaces;
+        foreach(NavMeshSurface surface in surfaces)
+        {
+            Debug.Log(surface.name);
+            surface.BuildNavMesh();
+            Debug.Log(surface.size);
+        }
+        
+        //NavMeshBuilder.ClearAllNavMeshes();
+        //NavMeshBuilder.BuildNavMesh();
+        //NavMeshBuilder.BuildNavMeshAsync();
+        Debug.Log("map generated");
+
     }
 
     private void GenerateTileMap(string[] refDataLines)
@@ -112,6 +128,12 @@ public class TileMapGenerator : MonoBehaviour
                 case 'p':
                     // add a player spawn point for this space
                     spawnManager.AddPlayerSpawnPoint(new Vector2(ctr + 1, rownumber + 1));
+                    // also place a ground tile under this space
+                    groundLayer.SetTile(new Vector3Int(ctr, rownumber), groundTile);
+                    break;
+                case 'e':
+                    // add an enemy spawn point for this space
+                    spawnManager.AddEnemySpawnPoint(new Vector2(ctr + 1, rownumber + 1));
                     // also place a ground tile under this space
                     groundLayer.SetTile(new Vector3Int(ctr, rownumber), groundTile);
                     break;

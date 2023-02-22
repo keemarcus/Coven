@@ -8,6 +8,8 @@ public class CameraManager : MonoBehaviour
     Camera mainCam;
 
     [Header("Camera Bounds")]
+    public Transform minBound;
+    public Transform maxBound;
     public float horizMin;
     public float horizMax;
     public float vertMin;
@@ -31,23 +33,8 @@ public class CameraManager : MonoBehaviour
     {
         if (player != null)
         {
-            Vector3 playerPosition = player.transform.position;
-            if (playerPosition.x < horizMin)
-            {
-                playerPosition.x = horizMin;
-            }
-            else if (playerPosition.x > horizMax)
-            {
-                playerPosition.x = horizMax;
-            }
-            if (playerPosition.y < vertMin)
-            {
-                playerPosition.y = vertMin;
-            }
-            else if (playerPosition.y > vertMax)
-            {
-                playerPosition.y = vertMax;
-            }
+            Vector3 playerPosition = new Vector3(Mathf.Clamp(player.transform.position.x, minBound.position.x, maxBound.position.x), Mathf.Clamp(player.transform.position.y, minBound.position.y, maxBound.position.y), 0f);
+
             Vector3 delta = playerPosition - mainCam.ViewportToWorldPoint(new Vector3(0.5f, 0.5f, zOffset));
             Vector3 destination = transform.position + delta;
             destination.z = zOffset;
