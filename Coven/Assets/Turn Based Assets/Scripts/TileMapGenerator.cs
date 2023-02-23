@@ -8,7 +8,7 @@ using UnityEditor;
 
 public class TileMapGenerator : MonoBehaviour
 {
-
+    public NavMeshSurface surface;
     public string refFileName;
     private Tilemap groundLayer;
     private Tilemap wallLayer;
@@ -26,7 +26,7 @@ public class TileMapGenerator : MonoBehaviour
     public SpawnManager spawnManager;
 
 
-    void Awake()
+    void Start()
     {
         // get all the tilemap objects
         groundLayer = this.gameObject.transform.Find("Ground").GetComponent<Tilemap>();
@@ -77,17 +77,18 @@ public class TileMapGenerator : MonoBehaviour
         gridManager.minBound.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
         gridManager.maxBound.SetPositionAndRotation(new Vector3(numberOfColumns, numberOfRows, 0f), Quaternion.identity);
 
-        gridManager.Setup();
+        //gridManager.Setup();
+        surface.BuildNavMesh();
         spawnManager.SpawnPlayers();
         spawnManager.SpawnEnemies();
-        FindObjectOfType<NavMeshSurface>().BuildNavMesh();
-        List<NavMeshSurface> surfaces = NavMeshSurface.activeSurfaces;
-        foreach(NavMeshSurface surface in surfaces)
-        {
-            Debug.Log(surface.name);
-            surface.BuildNavMesh();
-            Debug.Log(surface.size);
-        }
+        //FindObjectOfType<NavMeshSurface>().BuildNavMesh();
+        //List<NavMeshSurface> surfaces = NavMeshSurface.activeSurfaces;
+        //foreach(NavMeshSurface surface in surfaces)
+        //{
+        //    Debug.Log(surface.name);
+        //    surface.BuildNavMesh();
+        //    Debug.Log(surface.size);
+        //}
         
         //NavMeshBuilder.ClearAllNavMeshes();
         //NavMeshBuilder.BuildNavMesh();

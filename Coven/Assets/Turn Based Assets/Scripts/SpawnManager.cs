@@ -21,7 +21,6 @@ public class SpawnManager : MonoBehaviour
     public void AddEnemySpawnPoint(Vector2 position)
     {
         enemySpanPoints.Add(position);
-        Debug.Log(position);
     }
 
     public void SpawnPlayers()
@@ -47,13 +46,11 @@ public class SpawnManager : MonoBehaviour
         EnemyManager[] enemies = FindObjectsOfType<EnemyManager>();
         for (int ctr = 0; ctr < enemies.Length; ctr++)
         {
-            Debug.Log(enemies[ctr]);
             if (ctr < enemySpanPoints.Count && enemySpanPoints[ctr] != null)
             {
                 enemies[ctr].agent.enabled = false;
                 enemies[ctr].gameObject.transform.SetPositionAndRotation(enemySpanPoints[ctr], Quaternion.identity);
                 enemies[ctr].agent.enabled = true; ;
-                Debug.Log(enemies[ctr].transform.position);
             }
             else
             {
