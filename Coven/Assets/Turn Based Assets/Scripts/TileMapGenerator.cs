@@ -5,6 +5,7 @@ using UnityEngine.Tilemaps;
 using UnityEngine.AI;
 using System.IO;
 using UnityEditor;
+using System.Linq;
 
 public class TileMapGenerator : MonoBehaviour
 {
@@ -46,6 +47,7 @@ public class TileMapGenerator : MonoBehaviour
         {
             //GenerateRefFile(20, 20,new[] {(2, 2, 5, 5), (10, 10, 15, 15) });
             //GenerateRefFile(50, 50, GenerateRoomPositions(50,50,5,20));
+            GenerateRefFile(50, 50, 3);
         }
         
 
@@ -54,7 +56,7 @@ public class TileMapGenerator : MonoBehaviour
         string[] refDataLines = refData.Split('\n');
         for(int ctr = 0; ctr < refDataLines.Length; ctr++)
         {
-            refDataLines[ctr] = refDataLines[ctr].Trim();
+            //refDataLines[ctr] = refDataLines[ctr].Trim();
         }
 
         // determine the number of rows in the tilemap
@@ -69,32 +71,21 @@ public class TileMapGenerator : MonoBehaviour
         }
         Debug.Log("Tilemap Width = " + numberOfColumns);
 
-        spawnManager.Initialize();
+        // build the tilemap
         ClearTileMap();
+        spawnManager.Initialize();
         GenerateTileMap(refDataLines);
 
         // set the bounds of the grid
         gridManager.minBound.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
         gridManager.maxBound.SetPositionAndRotation(new Vector3(numberOfColumns, numberOfRows, 0f), Quaternion.identity);
 
-        //gridManager.Setup();
+        // update the navmesh
         surface.BuildNavMesh();
+
+        // spawn all the characters
         spawnManager.SpawnPlayers();
         spawnManager.SpawnEnemies();
-        //FindObjectOfType<NavMeshSurface>().BuildNavMesh();
-        //List<NavMeshSurface> surfaces = NavMeshSurface.activeSurfaces;
-        //foreach(NavMeshSurface surface in surfaces)
-        //{
-        //    Debug.Log(surface.name);
-        //    surface.BuildNavMesh();
-        //    Debug.Log(surface.size);
-        //}
-        
-        //NavMeshBuilder.ClearAllNavMeshes();
-        //NavMeshBuilder.BuildNavMesh();
-        //NavMeshBuilder.BuildNavMeshAsync();
-        Debug.Log("map generated");
-
     }
 
     private void GenerateTileMap(string[] refDataLines)
@@ -108,13 +99,21 @@ public class TileMapGenerator : MonoBehaviour
     private void GenerateRow(int rownumber, string row)
     {
         for(int ctr = 0; ctr < row.Length; ctr++)
-        {
-            //Debug.Log("Generating Tile at (" + ctr + ", " + rownumber + ")");
-            
+        {            
             switch (row[ctr])
             {
-                case '-':
+                case ' ':
                     // leave this space empty
+                    break;
+                case 't':
+                    // place a scene transition here
+
+                    // also place a ground tile under this space
+                    groundLayer.SetTile(new Vector3Int(ctr, rownumber), groundTile);
+                    break;
+                case '-':
+                    // place a path tile in this space
+                    groundLayer.SetTile(new Vector3Int(ctr, rownumber), groundTile);
                     break;
                 case 'w':
                     // place a wall tile in this space
@@ -163,6 +162,95 @@ public class TileMapGenerator : MonoBehaviour
         groundLayer.ClearAllTiles();
         wallLayer.ClearAllTiles();
     }
+
+    private void GenerateRefFile(int width, int height, int numberOfSceneTransitions)
+    {
+        // genertate a blank map of the desired size
+        string map = "";
+        for(int ctr = 0; ctr < height; ctr++)
+        {
+            for(int ctr2 = 0; ctr2 < width; ctr2++)
+            {
+                map += ' ';
+            }
+            if (ctr < (height - 1)) { map += '\n'; }
+        }
+        // generate the scene transition points
+        map = GenerateSceneTransitionPoints(width, height, map, numberOfSceneTransitions);
+        // generate a path to each of the points
+        map = GeneratePaths(width, height, map, numberOfSceneTransitions);
+        // fill in the gorund around the paths
+        // fill in the rest of the map with walls
+        // generate the spawn points
+        //Debug.Log(map);
+        File.WriteAllText(AssetDatabase.GetAssetPath(refFile), map);
+        EditorUtility.SetDirty(refFile);
+        AssetDatabase.SaveAssetIfDirty(refFile);
+        AssetDatabase.Refresh();
+    }
+    private string GenerateSceneTransitionPoints(int width, int height, string map, int numberOfTransitions)
+    {
+        Debug.Log("Generating Scene Transition Points");
+
+        Vector2Int[] transitionPositions = new Vector2Int[numberOfTransitions];
+        var xExclude = new HashSet<int>();
+        var yExclude = new HashSet<int>();
+        var rand = new System.Random();
+
+        for (int ctr = 0; ctr < numberOfTransitions; ctr++)
+        {
+            var xRange = Enumerable.Range(1, width).Where(i => !xExclude.Contains(i));
+            int xIndex = rand.Next(0, width - xExclude.Count);
+            var yRange = Enumerable.Range(1, height).Where(i => !yExclude.Contains(i));
+            int yIndex = rand.Next(0, height - yExclude.Count);
+
+            int newX = xRange.ElementAt(xIndex);
+            int newY = yRange.ElementAt(yIndex);
+
+            xExclude.Add(newX);
+            yExclude.Add(newY);
+
+            transitionPositions[ctr] = new Vector2Int(newX, newY);
+        }
+
+        foreach(Vector2Int transitionPosition in transitionPositions)
+        {
+            Debug.Log(transitionPosition);
+            string[] mapLines = map.Split('\n');
+            string targetLine = mapLines[transitionPosition.y];
+            targetLine = targetLine.Substring(0, transitionPosition.x) + 't' + targetLine.Substring(transitionPosition.x + 1, targetLine.Length - (transitionPosition.x + 1));
+            mapLines[transitionPosition.y] = targetLine;
+            map = string.Join("\n", mapLines);
+        }
+
+        Debug.Log(map);
+        return map;
+    }
+
+    private string GeneratePaths(int width, int height, string map, int numberOfTransitions)
+    {
+        Debug.Log("Generating Paths");
+
+        string[] mapLines = map.Split('\n');
+        for(int ctr = 0; ctr < mapLines.Length; ctr++)
+        {
+            if (mapLines[ctr].Contains('t'))
+            {
+                int pathPosition = mapLines[ctr].IndexOf('t');
+                string targetLine = mapLines[ctr + 1];
+                targetLine = targetLine.Substring(0, pathPosition) + '-' + targetLine.Substring(pathPosition + 1, targetLine.Length - (pathPosition + 1));
+                mapLines[ctr + 1] = targetLine;
+                targetLine = mapLines[ctr - 1];
+                targetLine = targetLine.Substring(0, pathPosition) + '-' + targetLine.Substring(pathPosition + 1, targetLine.Length - (pathPosition + 1));
+                mapLines[ctr - 1] = targetLine;
+            }
+        }
+        map = string.Join("\n", mapLines);
+
+        Debug.Log(map);
+        return map;
+    }
+
     private void GenerateRefFile(int width, int height, (int,int,int,int)[] rooms)
     {
         string map = "";
@@ -201,7 +289,15 @@ public class TileMapGenerator : MonoBehaviour
 
     private bool CheckForRefFile()
     {
-        return true;
+        // check to see if we've already generated the ref file
+        if (refFile.ToString().Equals(""))
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
     }
 
     private (int, int, int, int)[] GenerateRoomPositions(int width, int height, int numberOfRooms, int maxFailures)
