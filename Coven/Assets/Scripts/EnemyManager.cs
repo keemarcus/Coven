@@ -7,6 +7,7 @@ public class EnemyManager : CharacterManager
 {
     public NavMeshAgent agent;
     public Transform target;
+    public Transform leader;
     public Transform sight;
     public bool canSee;
     public float sightRange = 10f;
@@ -174,7 +175,7 @@ public class EnemyManager : CharacterManager
         }
     }
 
-    public void RaiseFromDead(string newTeamTag)
+    public void RaiseFromDead(string newTeamTag, Transform newLeader)
     {
         if(this.gameObject.GetComponentInChildren<Shield>() != null)
         {
@@ -184,6 +185,7 @@ public class EnemyManager : CharacterManager
         this.agent.enabled = true;
         this.characterStats.CurrentHP = this.characterStats.MaxHP;
         this.teamTag = newTeamTag;
+        this.leader = newLeader;
         this.selectedForRevive = false;
         this.animationManager.animator.SetBool("Dead", false);
         this.target = null;
