@@ -24,14 +24,6 @@ public class EnemyManager : CharacterManager
     public SpellSlot spell;
     public GameObject spellOriginOffset;
 
-    public Collider2D meleeAttackCollider;
-    public int meleeDamage;
-    public string meleeDamageType;
-
-    AudioSource audioSource;
-    public AudioClip meleeHitSound;
-
-
     // Start is called before the first frame update
     void Start()
     {
@@ -57,19 +49,9 @@ public class EnemyManager : CharacterManager
         alreadyCast = true;
     }
 
-    public void MeleeAttack(CharacterManager targetHit)
-    {
-        if (meleeHitSound != null && audioSource != null)
-        {
-            audioSource.clip = meleeHitSound;
-            audioSource.Play();
-        }
-        targetHit.TakeDamage(this.meleeDamage, this.meleeDamageType);
-    }
-
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        CharacterManager targetHit = collision.gameObject.GetComponent<CharacterManager>();
+        CharacterManager targetHit = collision.GetComponent<CharacterManager>();
         if(targetHit != null && targetHit.teamTag != this.teamTag)
         {
             MeleeAttack(targetHit);

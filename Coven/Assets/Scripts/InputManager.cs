@@ -143,8 +143,16 @@ public class InputManager : MonoBehaviour
     {
         if (attackInput)
         {
-            playerManager.HandleAttack();
+            if (playerManager.canDoCombo || playerManager.attackCooldown <= 0)
+            {
+                playerManager.HandleAttack();
+            }
         }
+    }
+
+    private void HandleSpellCast(float delta)
+    {
+
     }
 
     private void HandleInteractInput(float delta)

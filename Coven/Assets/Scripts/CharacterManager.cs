@@ -18,6 +18,14 @@ public abstract class CharacterManager : MonoBehaviour
     public Vector2 aimDirection;
     public bool alreadyCast;
     protected float healthRegenTimer;
+    public Collider2D meleeAttackCollider;
+    public float attackCooldown;
+    public int meleeDamage;
+    public string meleeDamageType;
+
+
+    public AudioSource audioSource;
+    public AudioClip meleeHitSound;
 
     [Serializable]
     public struct CharacterStats
@@ -148,6 +156,16 @@ public abstract class CharacterManager : MonoBehaviour
         }
 
         this.healthRegenTimer = 0f;
+    }
+
+    public void MeleeAttack(CharacterManager targetHit)
+    {
+        if (meleeHitSound != null && audioSource != null)
+        {
+            audioSource.clip = meleeHitSound;
+            audioSource.Play();
+        }
+        targetHit.TakeDamage(this.meleeDamage, this.meleeDamageType);
     }
 
     public void SetDirectionCHARMAN()

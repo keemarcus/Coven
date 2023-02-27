@@ -6,7 +6,13 @@ public class AttackStateManager : StateMachineBehaviour
 {
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
+        //animator.ResetTrigger("Attack");
+
         animator.ResetTrigger("Attack");
+        animator.SetBool("Combo", false);
+        animator.GetComponent<AnimationManager>().ResetComboFlag();
+        animator.GetComponent<AnimationManager>().SetCanDoCombo(0);
+        animator.GetComponent<AnimationManager>().SetIsInteracting(0);
 
         animator.GetComponent<AnimationManager>().SetIsInteracting(1);
         CharacterManager characterManager = animator.GetComponent<CharacterManager>();
@@ -15,10 +21,14 @@ public class AttackStateManager : StateMachineBehaviour
             characterManager.alreadyCast = false;
         }
 
-        EnemyManager enemyManager = animator.GetComponent<EnemyManager>();
-        if (enemyManager != null && enemyManager.meleeAttackCollider != null)
+        //CharacterManager characterManager = animator.GetComponent<CharacterManager>();
+        if (characterManager != null && characterManager.meleeAttackCollider != null)
         {
-            enemyManager.meleeAttackCollider.enabled = true;
+            characterManager.meleeAttackCollider.enabled = true;
+        }
+        else
+        {
+            Debug.Log("no AC");
         }
     }
 
@@ -26,10 +36,11 @@ public class AttackStateManager : StateMachineBehaviour
     {
         animator.GetComponent<AnimationManager>().SetIsInteracting(0);
 
-        EnemyManager enemyManager = animator.GetComponent<EnemyManager>();
-        if (enemyManager != null && enemyManager.meleeAttackCollider != null)
+        CharacterManager characterManager = animator.GetComponent<CharacterManager>();
+        if (characterManager != null && characterManager.meleeAttackCollider != null)
         {
-            enemyManager.meleeAttackCollider.enabled = false;
+            characterManager.meleeAttackCollider.enabled = false;
+            characterManager.attackCooldown = .7f;
         }
     }
 }

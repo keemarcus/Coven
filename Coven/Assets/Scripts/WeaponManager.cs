@@ -24,7 +24,8 @@ public class WeaponManager : MonoBehaviour
 
         damageCollider = GetComponent<BoxCollider2D>();
 
-        character = this.transform.GetComponent<CharacterManager>();
+        character = this.transform.parent.GetComponent<CharacterManager>();
+        Debug.Log(character.name);
 
         // load all the individual sprites from the sprite sheet
         //attackSprites = Resources.LoadAll<Sprite>("4d_attacks/rmsheets/" + spriteSheet.name);
@@ -48,6 +49,15 @@ public class WeaponManager : MonoBehaviour
         if(hitCharacterManager != null)
         {
             //hitCharacterManager.TakeDamage(CalculateDamage(hitCharacterManager), damageType);
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        CharacterManager targetHit = collision.GetComponent<CharacterManager>();
+        if (targetHit != null && targetHit.teamTag != character.teamTag)
+        {
+            character.MeleeAttack(targetHit);
         }
     }
 

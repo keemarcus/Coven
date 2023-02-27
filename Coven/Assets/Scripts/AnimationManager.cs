@@ -36,7 +36,7 @@ public class AnimationManager : MonoBehaviour
         if(Mathf.Abs(animator.GetFloat("Y")) > Mathf.Abs(animator.GetFloat("X"))){ animator.SetFloat("X", 0); }
         else if (Mathf.Abs(animator.GetFloat("X")) > Mathf.Abs(animator.GetFloat("Y"))) { animator.SetFloat("Y", 0); }
         animator.SetTrigger("Attack");
-        //animator.SetBool("Combo", characterManager.comboFlag);
+        animator.SetBool("Combo", characterManager.comboFlag);
     }
     public void HandleCastAnimations(string spellType)
     {

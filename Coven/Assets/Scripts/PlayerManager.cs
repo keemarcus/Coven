@@ -10,7 +10,7 @@ public class PlayerManager : CharacterManager
     PlayerLocomotion playerLocomotion;
     CameraManager cameraManager;
     SpellUIManager spellUIManager;
-    public AudioSource audioSource;
+    //public AudioSource audioSource;
     public GameObject musicPrefab;
     public AudioClip outOfEnergySound;
     public AudioClip bossMusic;
@@ -18,6 +18,8 @@ public class PlayerManager : CharacterManager
 
     public bool wonGame;
     private float deathTimer;
+
+    //public float attackCooldown;
 
     private int lastHealthIncrement;
 
@@ -61,10 +63,11 @@ public class PlayerManager : CharacterManager
         }
 
         deathTimer = 0f;
+        attackCooldown = 0f;
         wonGame = false;
     }
 
-    new public void HandleAttack()
+    public void HandleSpellCast()
     {
         if (isInteracting) { return; }
         if (this.characterStats.EnergyLevel < activeSpell.spellScript.energyCost)
@@ -160,6 +163,11 @@ public class PlayerManager : CharacterManager
 
         // take player inputs
         inputManager.TickInput(delta);
+
+        if (attackCooldown > 0)
+        {
+            attackCooldown -= Time.deltaTime;
+        }
 
         activeSpell.spellScript.CheckForTarget(spellOriginOffset.transform.position);
 
