@@ -140,6 +140,8 @@ public abstract class CharacterManager : MonoBehaviour
         // remove the damage resistance value from the incoming damage
         damageAmount = Math.Clamp(damageAmount - characterStats.DamageResistance, 0, damageAmount);
 
+        Debug.Log(characterStats.DamageResistance);
+        Debug.Log(damageAmount);
         Debug.Log(this.gameObject.name + " took " + damageAmount + " " + damageType +" damage.");
         characterStats.CurrentHP -= damageAmount;
         if(characterStats.CurrentHP <= 0)

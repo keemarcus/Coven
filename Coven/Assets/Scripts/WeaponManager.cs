@@ -12,6 +12,7 @@ public class WeaponManager : MonoBehaviour
     BoxCollider2D damageCollider;
 
     CharacterManager character;
+    private bool inAttack;
 
     [Header("Weapon Stats")]
     public string damageType;
@@ -25,7 +26,7 @@ public class WeaponManager : MonoBehaviour
         damageCollider = GetComponent<BoxCollider2D>();
 
         character = this.transform.parent.GetComponent<CharacterManager>();
-        Debug.Log(character.name);
+        inAttack = false;
 
         // load all the individual sprites from the sprite sheet
         //attackSprites = Resources.LoadAll<Sprite>("4d_attacks/rmsheets/" + spriteSheet.name);
@@ -41,37 +42,31 @@ public class WeaponManager : MonoBehaviour
         }
         
     }
-
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void LateUpdate()
     {
-        CharacterManager hitCharacterManager = collision.gameObject.GetComponent<CharacterManager>();
-
-        if(hitCharacterManager != null)
-        {
-            //hitCharacterManager.TakeDamage(CalculateDamage(hitCharacterManager), damageType);
-        }
+        if (inAttack) { inAttack = false; }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        CharacterManager targetHit = collision.GetComponent<CharacterManager>();
-        if (targetHit != null && targetHit.teamTag != character.teamTag)
+        if (inAttack)
         {
-            character.MeleeAttack(targetHit);
+            return;
         }
-    }
 
-    private int CalculateDamage(CharacterManager collidedCharacter)
-    {
-        // start with the base damage
-        int damage = baseDamage;
+        inAttack = true;
+        CharacterManager targetHit = collision.GetComponent<CharacterManager>();
+        if (targetHit != null && targetHit.teamTag != character.teamTag && targetHit.gameObject.name != this.gameObject.name)
+        {
+            // play sound effect
+            //if (meleeHitSound != null && audioSource != null)
+            {
+                //audioSource.clip = meleeHitSound;
+                //audioSource.Play();
+            }
 
-        // check for stats on attacking character that effect the damage
-        damage += character.characterStats.HitBonus;
-
-        // check for stats on the character we collided with that effect the damage
-        damage -= collidedCharacter.characterStats.DamageResistance;
-
-        return damage;
+            // damaeg the target that was hit
+            targetHit.TakeDamage(this.baseDamage, this.damageType);
+        }
     }
 }

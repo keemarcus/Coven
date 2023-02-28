@@ -12,6 +12,7 @@ public class InputManager : MonoBehaviour
     public float mouseY;
 
     public bool attackInput;
+    public bool castSpellInput;
     public bool interactInput;
     public bool pauseInput;
     private static bool gamePaused;
@@ -49,6 +50,7 @@ public class InputManager : MonoBehaviour
             inputActions = new PlayerControls();
             inputActions.PlayerMovement.Movement.performed += inputActions => movementInput = inputActions.ReadValue<Vector2>();
             inputActions.PlayerActions.Attack.performed += i => attackInput = true;
+            inputActions.SpellCasting.CastSpell.performed += i => castSpellInput = true;
             inputActions.PlayerActions.Interact.performed += i => interactInput = true;
             inputActions.PlayerActions.Pause.performed += i => pauseInput = true;
             inputActions.SpellCasting.ChangeSpell.performed += i => changeSpell = true;
@@ -127,6 +129,7 @@ public class InputManager : MonoBehaviour
 
         HanldeMoveInput(delta);
         HandleAttackInput(delta);
+        HandleSpellCastInput(delta);
         HandleInteractInput(delta);
         HandleChangeSpellInput(delta);
     }
@@ -150,9 +153,12 @@ public class InputManager : MonoBehaviour
         }
     }
 
-    private void HandleSpellCast(float delta)
+    private void HandleSpellCastInput(float delta)
     {
-
+        if (castSpellInput)
+        {
+            playerManager.HandleSpellCast();
+        }
     }
 
     private void HandleInteractInput(float delta)

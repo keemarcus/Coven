@@ -52,7 +52,7 @@ public class EnemyManager : CharacterManager
     private void OnTriggerEnter2D(Collider2D collision)
     {
         CharacterManager targetHit = collision.GetComponent<CharacterManager>();
-        if(targetHit != null && targetHit.teamTag != this.teamTag)
+        if(targetHit != null && targetHit.teamTag != this.teamTag && targetHit.gameObject.name != this.gameObject.name)
         {
             MeleeAttack(targetHit);
         }

@@ -228,6 +228,15 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Cast Spell"",
+                    ""type"": ""Button"",
+                    ""id"": ""8c8a6f83-8515-4dc4-9aa7-33eee4cd3ee6"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -252,6 +261,17 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
                     ""action"": ""Change Spell"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""95b19255-7e77-4d7b-9d1e-f1618e6ef59e"",
+                    ""path"": ""<Keyboard>/c"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Cast Spell"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -270,6 +290,7 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
         m_SpellCasting = asset.FindActionMap("Spell Casting", throwIfNotFound: true);
         m_SpellCasting_CycleSpell = m_SpellCasting.FindAction("Cycle Spell", throwIfNotFound: true);
         m_SpellCasting_ChangeSpell = m_SpellCasting.FindAction("Change Spell", throwIfNotFound: true);
+        m_SpellCasting_CastSpell = m_SpellCasting.FindAction("Cast Spell", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -413,12 +434,14 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
     private ISpellCastingActions m_SpellCastingActionsCallbackInterface;
     private readonly InputAction m_SpellCasting_CycleSpell;
     private readonly InputAction m_SpellCasting_ChangeSpell;
+    private readonly InputAction m_SpellCasting_CastSpell;
     public struct SpellCastingActions
     {
         private @PlayerControls m_Wrapper;
         public SpellCastingActions(@PlayerControls wrapper) { m_Wrapper = wrapper; }
         public InputAction @CycleSpell => m_Wrapper.m_SpellCasting_CycleSpell;
         public InputAction @ChangeSpell => m_Wrapper.m_SpellCasting_ChangeSpell;
+        public InputAction @CastSpell => m_Wrapper.m_SpellCasting_CastSpell;
         public InputActionMap Get() { return m_Wrapper.m_SpellCasting; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -434,6 +457,9 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
                 @ChangeSpell.started -= m_Wrapper.m_SpellCastingActionsCallbackInterface.OnChangeSpell;
                 @ChangeSpell.performed -= m_Wrapper.m_SpellCastingActionsCallbackInterface.OnChangeSpell;
                 @ChangeSpell.canceled -= m_Wrapper.m_SpellCastingActionsCallbackInterface.OnChangeSpell;
+                @CastSpell.started -= m_Wrapper.m_SpellCastingActionsCallbackInterface.OnCastSpell;
+                @CastSpell.performed -= m_Wrapper.m_SpellCastingActionsCallbackInterface.OnCastSpell;
+                @CastSpell.canceled -= m_Wrapper.m_SpellCastingActionsCallbackInterface.OnCastSpell;
             }
             m_Wrapper.m_SpellCastingActionsCallbackInterface = instance;
             if (instance != null)
@@ -444,6 +470,9 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
                 @ChangeSpell.started += instance.OnChangeSpell;
                 @ChangeSpell.performed += instance.OnChangeSpell;
                 @ChangeSpell.canceled += instance.OnChangeSpell;
+                @CastSpell.started += instance.OnCastSpell;
+                @CastSpell.performed += instance.OnCastSpell;
+                @CastSpell.canceled += instance.OnCastSpell;
             }
         }
     }
@@ -462,5 +491,6 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
     {
         void OnCycleSpell(InputAction.CallbackContext context);
         void OnChangeSpell(InputAction.CallbackContext context);
+        void OnCastSpell(InputAction.CallbackContext context);
     }
 }

@@ -217,6 +217,7 @@ public class PlayerManager : CharacterManager
     {
         // reset all our input variables at the end of the frame so they can only be triggered once per press
         inputManager.attackInput = false;
+        inputManager.castSpellInput = false;
         inputManager.interactInput = false;
         inputManager.changeSpell = false;
     }

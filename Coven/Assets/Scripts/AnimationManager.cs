@@ -46,10 +46,10 @@ public class AnimationManager : MonoBehaviour
         switch (spellType)
         {
             case "Attack":
-                animator.SetTrigger("Attack");
+                animator.SetTrigger("Spell Attack");
                 break;
             case "Summon":
-                animator.SetTrigger("Summon");
+                animator.SetTrigger("Spell Summon");
                 break;
             default:
                 animator.SetTrigger("Attack");
